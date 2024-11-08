@@ -12,6 +12,7 @@ float frameTime = 16.0f;
 
 Game::Game(): mWindow(nullptr), mIsRunning(true)
 {
+	std::cout << "Game Starting ... " << std::endl;
 }
 	// Initialize our game
 bool Game::Initialize() {
