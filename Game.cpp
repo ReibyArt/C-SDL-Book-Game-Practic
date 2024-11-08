@@ -7,6 +7,7 @@ using namespace std;
 const int thickness = 10; // Wall Thickness
 const float paddleH = 200.0f; // Height of Paddle
 Uint32 mTicksCount = 0;
+Uint32 bullettime = 256;
 
 
 
@@ -62,7 +63,15 @@ void Game::UpdateGame()
 {
 	float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
 	mTicksCount = SDL_GetTicks();
-	std::cout << mTicksCount << std::endl;
+	// std::cout << mTicksCount << std::endl;
+	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + bullettime));
+	{
+		std::cout << mTicksCount << " In While " << std::endl;
+	}
+	if (deltaTime > 0.05f) {
+		deltaTime = 0.5f;
+	}
+	
 }
 
 // Main Game Loop
