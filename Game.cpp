@@ -128,6 +128,8 @@ void Game::UpdateGame()
 	// Game Over - Пиксель упущен))
 	else if (mBallPos.x <= 0.0f)
 	{
+		std::cout << "Game Over" << std::endl;
+		SDL_Delay(3000);
 		mIsRunning = false;
 	}
 	// Удар в правую стену
