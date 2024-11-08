@@ -1,7 +1,17 @@
 #pragma once
 #include <SDL.h>
 
-class Game {
+
+// Хранение координат для мяча и ракетки
+struct Vector2
+{
+	float x;
+	float y;
+};
+
+// Главный Игровой Класс
+class Game 
+{
 public:
 
 	Game();
@@ -11,11 +21,18 @@ public:
 
 private:
 	// Вспомогательные функции для игрового цикла
-
 	void ProcessInput();
-	//void updategame(); // обновление игры 
-	//void generateoutput();
+	void UpdateGame(); 
+	void GenerateOutput();
+
+
 	SDL_Window* mWindow; // Создание окна
+	SDL_Renderer* mRenderer; // Создание Рендера
 	bool mIsRunning; // Проверка запуска игры
 
+	// Позиция мяча и ракетки
+	Vector2 mBallPos;
+	Vector2 mPaddlePos;
+	
+	
 };
