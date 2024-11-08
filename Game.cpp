@@ -4,10 +4,10 @@ using namespace std;
 
 
 
-const int thickness = 10; // Wall Thickness
+const int thickness = 20; // Wall Thickness
 const float paddleH = 200.0f; // Height of Paddle
 Uint32 mTicksCount = 0;
-Uint32 bulletTime = 256;
+float bulletTime = 64.0f;
 
 
 
@@ -17,13 +17,15 @@ Game::Game(): mWindow(nullptr), mIsRunning(true)
 }
 	// Initialize our game
 bool Game::Initialize() {
+
+
 	
 	int sdlResault = SDL_Init(SDL_INIT_VIDEO);
 	if (sdlResault != 0) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError);
 		return false;
 	}
-	mWindow = SDL_CreateWindow("My First SDL Game", 100,100,1024, 768, 0);
+	mWindow = SDL_CreateWindow("My First SDL Game", 100, 100, 1024, 768, 0);
 	if (!mWindow) {
 		SDL_Log("Falied to create window: %s", SDL_GetError);
 		return false;
@@ -55,6 +57,14 @@ void Game::ProcessInput() {
 	if (state[SDL_SCANCODE_ESCAPE]) {
 		mIsRunning = false;
 	}
+
+	// Direction our paddle //
+	if (state[SDL_SCANCODE_W]) {
+		mPaddleDir = mPaddleDir - 1.0f;
+	}
+	if (state[SDL_SCANCODE_S]) {
+		mPaddleDir = mPaddleDir + 1.0f;
+	}
 }
 
 
@@ -62,17 +72,42 @@ void Game::ProcessInput() {
 void Game::UpdateGame()
 {
 	float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
+	// std::cout << "Current Frame From DeltaTime-> " << deltaTime << std::endl;
 	mTicksCount = SDL_GetTicks();
-	std::cout << mTicksCount << std::endl;
 
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + bulletTime));
 	{
-		std::cout << "tick in while " << mTicksCount << std::endl;
+		// std::cout << "tick in while " << mTicksCount << std::endl;
 	}
 	if (deltaTime > 0.5f) {
 		deltaTime = 0.5f;
 	}
+	// Paddle Dir
+	if (mPaddleDir != 0) {
+		mPaddlePos.y = mPaddleDir * 300.0f * deltaTime;
+	}
+	std::cout << "Current PaddlePosY -> " << mPaddlePos.y << std::endl;
+
+	// Check Paddle Screen!
+
+	if (mPaddlePos.y > 768.0f - thickness) {
+		std::cout << "More than screen!" << std::endl;
+	}
+
+
+	// Check paddle collider ))
+	if (mPaddlePos.y < (paddleH / 2.0f + thickness)) {
+		mPaddlePos.y = paddleH / 2.0f + thickness;
+	}
+
+	else if (mPaddlePos.y > (768.0f - paddleH / 2.0f - thickness)) {
+		mPaddlePos.y = 768.0f - paddleH / 2.0f - thickness;
+	}
+	
+
+	
 }
+
 
 // Main Game Loop
 void Game::RunLoop() {

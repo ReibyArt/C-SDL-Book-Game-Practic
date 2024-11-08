@@ -33,6 +33,7 @@ private:
 	// Позиция мяча и ракетки
 	Vector2 mBallPos;
 	Vector2 mPaddlePos;
+	float mPaddleDir = 0.0f;
 	
 	
 };
