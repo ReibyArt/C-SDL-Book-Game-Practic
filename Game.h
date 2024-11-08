@@ -22,7 +22,9 @@ public:
 private:
 	// Вспомогательные функции для игрового цикла
 	void ProcessInput();
-	void UpdateGame(); 
+	void UpdateGame();
+	
+
 	void GenerateOutput();
 
 
@@ -34,6 +36,7 @@ private:
 	Vector2 mBallPos;
 	Vector2 mPaddlePos;
 	float mPaddleDir = 0.0f;
+	Vector2 mBallVel; 
 	
 	
 };

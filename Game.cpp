@@ -4,15 +4,13 @@ using namespace std;
 
 
 
-const int thickness = 20; // Wall Thickness
-const float paddleH = 200.0f; // Height of Paddle
+const int thickness = 10; // Wall Thickness
+const float paddleH = 100; // Height of Paddle
 Uint32 mTicksCount = 0;
-float bulletTime = 64.0f;
+float frameTime = 16.0f;
 
 
-
-
-Game::Game(): mWindow(nullptr), mIsRunning(true) 
+Game::Game(): mWindow(nullptr), mIsRunning(true)
 {
 }
 	// Initialize our game
@@ -38,6 +36,9 @@ bool Game::Initialize() {
 	mPaddlePos.y = 768.0f / 2.0f;
 	mBallPos.x = 1024.0f / 2.0f;
 	mBallPos.y = 768.0f / 2.0f;
+	mBallVel.x = -200.0f;
+	mBallVel.y = 235.0f;
+	
 }
 
 
@@ -54,17 +55,20 @@ void Game::ProcessInput() {
 	}
 	const Uint8* state = SDL_GetKeyboardState(NULL); // œŒÀ”◊¿≈Ã —Œ—“ŒﬂÕ»≈  À¿¬»¿“”–€ Ã¿——»¬  ¿ ¿ﬂ  ÕŒœ ¿ Õ¿∆¿“¿
 
-	if (state[SDL_SCANCODE_ESCAPE]) {
-		mIsRunning = false;
-	}
+	if(state != NULL) {
+		if (state[SDL_SCANCODE_ESCAPE]) {
+			mIsRunning = false;
+		}
 
-	// Direction our paddle //
-	if (state[SDL_SCANCODE_W]) {
-		mPaddleDir = mPaddleDir - 1.0f;
+		// Direction our paddle UP DOWN //
+		if (state[SDL_SCANCODE_W]) {
+			mPaddleDir = mPaddleDir - 1.0f;
+		}
+		if (state[SDL_SCANCODE_S]) {
+			mPaddleDir = mPaddleDir + 1.0f;
+		}
 	}
-	if (state[SDL_SCANCODE_S]) {
-		mPaddleDir = mPaddleDir + 1.0f;
-	}
+	
 }
 
 
@@ -75,7 +79,7 @@ void Game::UpdateGame()
 	// std::cout << "Current Frame From DeltaTime-> " << deltaTime << std::endl;
 	mTicksCount = SDL_GetTicks();
 
-	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + bulletTime));
+	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + frameTime));
 	{
 		// std::cout << "tick in while " << mTicksCount << std::endl;
 	}
@@ -84,29 +88,67 @@ void Game::UpdateGame()
 	}
 	// Paddle Dir
 	if (mPaddleDir != 0) {
-		mPaddlePos.y = mPaddleDir * 300.0f * deltaTime;
+		mPaddlePos.y += mPaddleDir * 300.0f * deltaTime;
 	}
-	std::cout << "Current PaddlePosY -> " << mPaddlePos.y << std::endl;
-
-	// Check Paddle Screen!
-
-	if (mPaddlePos.y > 768.0f - thickness) {
-		std::cout << "More than screen!" << std::endl;
-	}
+	 // std::cout << "Current PaddlePosY -> " << mPaddlePos.y << std::endl;
 
 
-	// Check paddle collider ))
+	// Check paddle collider wall ))
+
 	if (mPaddlePos.y < (paddleH / 2.0f + thickness)) {
 		mPaddlePos.y = paddleH / 2.0f + thickness;
 	}
 
 	else if (mPaddlePos.y > (768.0f - paddleH / 2.0f - thickness)) {
+		
 		mPaddlePos.y = 768.0f - paddleH / 2.0f - thickness;
 	}
-	
 
-	
+	// Update Ball Position
+	float diff = mBallPos.y - mPaddlePos.y;
+	// Take absolute value of difference
+	diff = (diff > 0.0f) ? diff : -diff;
+	mBallPos.x += mBallVel.x * deltaTime;
+	mBallPos.y += mBallVel.y * deltaTime;
+	// std::cout << "Current PosBall -> " << mBallPos.x << std::endl;
+
+	if (mBallPos.y <= thickness && mBallVel.y < 0.0f) {
+		mBallVel.y = mBallVel.y * -1;
+	}
+	if (
+		// Our y-difference is small enough
+		diff <= paddleH / 2.0f &&
+		// We are in the correct x-position
+		mBallPos.x <= 25.0f && mBallPos.x >= 20.0f &&
+		// The ball is moving to the left
+		mBallVel.x < 0.0f)
+	{
+		mBallVel.x *= -1.0f;
+	}
+	// Game Over - œËÍÒÂÎ¸ ÛÔÛ˘ÂÌ))
+	else if (mBallPos.x <= 0.0f)
+	{
+		mIsRunning = false;
+	}
+	// ”‰‡ ‚ Ô‡‚Û˛ ÒÚÂÌÛ
+	else if (mBallPos.x >= (1024.0f - thickness) && mBallVel.x > 0.0f)
+	{
+		mBallVel.x *= -1.0f;
+	}
+
+	// ”‰‡ ‚ ‚ÂıÌ˛˛ ÒÚÂÌÛ
+	if (mBallPos.y <= thickness && mBallVel.y < 0.0f)
+	{
+		mBallVel.y *= -1;
+	}
+	// ”‰‡ ‚ ÌËÊÌ˛˛ ÒÚÂÌÛ
+	else if (mBallPos.y >= (768 - thickness) &&
+		mBallVel.y > 0.0f)
+	{
+		mBallVel.y *= -1;
+	}
 }
+
 
 
 // Main Game Loop
